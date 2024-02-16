@@ -1,8 +1,16 @@
 import streamlit as st
 import feedparser
 import requests
+import os
 from bs4 import BeautifulSoup
 from functools import lru_cache
+
+USER_ID = 'openai'
+APP_ID = 'chat-completion'
+# Change these to whatever model and text URL you want to use
+MODEL_ID = 'gpt-4-vision-alternative'
+MODEL_VERSION_ID = '12b67ac2b5894fb9af9c06ebf8dc02fb'
+PAT = os.environ.get('PAT')
 
 # Function to fetch RSS feed items
 @st.cache(allow_output_mutation=True, show_spinner=False)
@@ -25,7 +33,7 @@ def fetch_html_content(item_id, item_url):
 
 # Main function to run the Streamlit app
 def main():
-    st.title("RSS Reader App")
+    st.title("LexaScan")
 
     # Input field for entering RSS URL
     rss_url = st.text_input("Enter RSS URL:")
