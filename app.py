@@ -63,6 +63,9 @@ def main():
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
 
+    # Use st.markdown() to create an empty space in the sidebar
+    st.sidebar.markdown("<div style='margin-top:2000px'></div>", unsafe_allow_html=True)
+
 if __name__ == "__main__":
     main()
 
