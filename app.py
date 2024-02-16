@@ -50,10 +50,15 @@ def main():
                 selected_item = items[selected_item_index]
                 st.write(selected_item.title)
 
+                # Placeholder for item content
+                item_content_placeholder = st.empty()
+                
                 # Fetch and display HTML content with caching based on item ID
                 item_id = selected_item.id if selected_item.id else selected_item.link
                 item_content = fetch_html_content(item_id, selected_item.link)
-                st.write(item_content)
+
+                # Update placeholder with item content
+                item_content_placeholder.write(item_content)
 
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
