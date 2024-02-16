@@ -13,7 +13,7 @@ MODEL_VERSION_ID = '12b67ac2b5894fb9af9c06ebf8dc02fb'
 PAT = os.environ.get('PAT')
 
 # Function to fetch RSS feed items
-@st.cache(allow_output_mutation=True, show_spinner=False)
+@lru.cache(maxsize=128)
 def fetch_feed(url):
     feed = feedparser.parse(url)
     return feed.entries
