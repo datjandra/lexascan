@@ -31,10 +31,10 @@ def fetch_feed(url):
 @lru_cache(maxsize=128)
 def extract_info(text):
     prompt = f"""
-    Here is a news text and image link.
-    Extract named entities such as people, places, companies, and organizations into a structured JSON format.
-    Extract any dates and times.
-    Extract objects in the image that correlate with the text.
+    Here is some text and an optional image link.
+    Extract named entities such as people, places, companies, and organizations from the image and text into a structured JSON format.
+    Extract any dates and times from the text.
+    Extract any objects from the image.
 
     {text}
     """
