@@ -47,12 +47,15 @@ def main():
                 # Display selected item content
                 selected_item_index = st.selectbox("Select an item", range(len(items)), key="selectbox_key")
                 selected_item = items[selected_item_index]
-                st.write(selected_item.title)
+                
+                # Create formatted string with title, image URL, and description
+                formatted_string = f"Title: {selected_item.title}\n"
+                if 'image' in selected_item:
+                    formatted_string += f"Image URL: {selected_item.image.url}\n"
+                formatted_string += f"Description: {selected_item.summary}"
 
-                # Fetch and display HTML content with caching based on item ID
-                item_id = selected_item.id if selected_item.id else selected_item.link
-                item_content = fetch_html_content(item_id, selected_item.link)
-                st.write(item_content)
+                # Write formatted string to text area
+                st.text_area("Item Details", value=formatted_string, height=200)
 
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
