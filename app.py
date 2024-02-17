@@ -36,7 +36,7 @@ def main():
     st.title("LexaScan")
 
     # Input field for entering RSS URL
-    rss_url = st.text_input("Enter RSS URL:")
+    rss_url = st.text_input("Enter RSS URL:", "https://feeds.bbci.co.uk/news/rss.xml")
 
     # Button to fetch RSS items
     if "clicked" not in st.session_state:
