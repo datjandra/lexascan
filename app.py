@@ -2,6 +2,7 @@ import streamlit as st
 import feedparser
 import requests
 import os
+import json
 from functools import lru_cache
 
 from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
@@ -26,9 +27,9 @@ def fetch_feed(url):
     feed = feedparser.parse(url)
     return feed.entries
 
-# Function to analyze text
+# Function to extract info
 @lru_cache(maxsize=128)
-def analyze_text(text):
+def extract_info(text):
     prompt = f"""
     Here is a news text and image link.
     Extract named entities such as people, places, companies, and organizations into a structured JSON format.
@@ -65,7 +66,7 @@ def analyze_text(text):
     output = post_model_outputs_response.outputs[0]
 
     print("Completion:\n")
-    return output.data.text.raw
+    return json.loads(output.data.text.raw)
 
 # Main function to run the Streamlit app
 def main():
@@ -106,12 +107,12 @@ def main():
 
                 if "clicked" not in st.session_state:
                     st.session_state.clicked = False
-                if st.button("Analyze") or st.session_state["clicked"]:
+                if st.button("Extract") or st.session_state["clicked"]:
                     st.session_state["clicked"] = True
                     if item_details:
-                        analyzed_text = analyze_text(item_details)
-                        st.write("Analyzed text:")
-                        st.write(analyzed_text)
+                        extracted_info = extract_info(item_details)
+                        st.write("Extracted Info:")
+                        st.json(extracted_info)
 
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
