@@ -106,7 +106,7 @@ def main():
                 formatted_string += f"Description: {selected_item.summary}"
 
                 # Write formatted string to text area
-                item_details = st.text_area("Item Details", value=formatted_string, height=200)
+                item_details = st.text_area("Details", value=formatted_string, height=200)
 
                 if "clicked" not in st.session_state:
                     st.session_state.clicked = False
