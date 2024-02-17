@@ -54,7 +54,8 @@ def main():
                 # Extracting image URL from media:thumbnail tag
                 image_url = None
                 for key in selected_item.keys():
-                    if key.startswith('media:thumbnail'):
+                    print(key)
+                    if 'media' in key:
                         image_url = selected_item[key][0]['url']
                         break
                 
