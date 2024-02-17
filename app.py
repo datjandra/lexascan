@@ -13,7 +13,7 @@ USER_ID = 'openai'
 APP_ID = 'chat-completion'
 # Change these to whatever model and text URL you want to use
 MODEL_ID = 'gpt-4-vision-alternative'
-MODEL_VERSION_ID = '12b67ac2b5894fb9af9c06ebf8dc02fb'
+MODEL_VERSION_ID = os.environ.get('MODEL_VERSION_ID')
 PAT = os.environ.get('PAT')
 
 channel = ClarifaiChannel.get_grpc_channel()
@@ -83,10 +83,14 @@ def main():
         if rss_url:
             try:
                 items = fetch_feed(rss_url)
+                st.sidebar.header("News Items")
 
-                # Display selected item content
-                selected_item_index = st.selectbox("Select an item", range(len(items)), key="selectbox_key")
-                selected_item = items[selected_item_index]
+                # Extract titles of RSS items
+                item_titles = [item.title for item in items]
+
+                 # Display selected item content by title
+                selected_item_title = st.sidebar.selectbox("Select an item", item_titles, key="selectbox_key")
+                selected_item = next(item for item in items if item.title == selected_item_title)
 
                 # Extracting image URL from media:thumbnail tag
                 image_url = None
@@ -108,10 +112,7 @@ def main():
                 # Write formatted string to text area
                 item_details = st.text_area("Details", value=formatted_string, height=200)
 
-                if "clicked" not in st.session_state:
-                    st.session_state.clicked = False
-                if st.button("Extract") or st.session_state["clicked"]:
-                    st.session_state["clicked"] = True
+                if st.button("Extract"):
                     if item_details:
                         extracted_info = extract_info(item_details)
                         st.write("Extracted Info:")
