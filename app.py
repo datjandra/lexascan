@@ -45,7 +45,7 @@ def main():
                 items = fetch_feed(rss_url)
 
                 # Display selected item content
-                selected_item_index = st.selectbox("Select an item", range(len(items)))
+                selected_item_index = st.selectbox("Select an item", range(len(items)), key="selectbox_key")
                 selected_item = items[selected_item_index]
                 st.write(selected_item.title)
 
