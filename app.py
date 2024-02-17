@@ -62,7 +62,7 @@ def main():
                 # Create formatted string with title, image URL, and description
                 formatted_string = f"Title: {selected_item.title}\n"
                 if image_url:
-                    formatted_string += f"Image URL: {image_url}"
+                    formatted_string += f"Image URL: {image_url}\n"
                 formatted_string += f"Description: {selected_item.summary}"
 
                 # Write formatted string to text area
