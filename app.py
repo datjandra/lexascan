@@ -36,7 +36,7 @@ def main():
     st.title("LexaScan")
 
     # Input field for entering RSS URL
-    rss_url = st.text_input("Enter RSS URL:", "https://feeds.bbci.co.uk/news/rss.xml")
+    rss_url = st.text_input("Enter RSS URL:", "https://feeds.bbci.co.uk/news/world/rss.xml")
 
     # Button to fetch RSS items
     if "clicked" not in st.session_state:
@@ -50,11 +50,18 @@ def main():
                 # Display selected item content
                 selected_item_index = st.selectbox("Select an item", range(len(items)), key="selectbox_key")
                 selected_item = items[selected_item_index]
+
+                # Extracting image URL from media:thumbnail tag
+                image_url = None
+                for key in selected_item.keys():
+                    if key.startswith('media:thumbnail'):
+                        image_url = selected_item[key][0]['url']
+                        break
                 
                 # Create formatted string with title, image URL, and description
                 formatted_string = f"Title: {selected_item.title}\n"
-                if 'image' in selected_item:
-                    formatted_string += f"Image URL: {selected_item.image.url}\n"
+                if image_url:
+                    formatted_string += f"Image URL: {image_url}"
                 formatted_string += f"Description: {selected_item.summary}"
 
                 # Write formatted string to text area
