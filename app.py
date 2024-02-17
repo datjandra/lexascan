@@ -39,7 +39,10 @@ def main():
     rss_url = st.text_input("Enter RSS URL:")
 
     # Button to fetch RSS items
-    if st.button("Fetch RSS Items"):
+    if "clicked" not in st.session_state:
+        st.session_state.clicked = False
+    if st.button("Fetch RSS Items") or st.session_state["clicked"]:
+        st.session_state["clicked"] = True
         if rss_url:
             try:
                 items = fetch_feed(rss_url)
