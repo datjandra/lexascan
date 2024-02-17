@@ -43,29 +43,19 @@ def main():
         if rss_url:
             try:
                 items = fetch_feed(rss_url)
-                st.sidebar.header("RSS Items")
-                selected_item_index = st.sidebar.selectbox("Select an item", range(len(items)))
 
                 # Display selected item content
+                selected_item_index = st.selectbox("Select an item", range(len(items)))
                 selected_item = items[selected_item_index]
                 st.write(selected_item.title)
 
-                # Placeholder for item content
-                item_content_placeholder = st.empty()
-                
                 # Fetch and display HTML content with caching based on item ID
                 item_id = selected_item.id if selected_item.id else selected_item.link
                 item_content = fetch_html_content(item_id, selected_item.link)
-
-                # Update placeholder with item content
-                item_content_placeholder.write(item_content)
+                st.write(item_content)
 
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
 
-    # Use st.markdown() to create an empty space in the sidebar
-    st.sidebar.markdown("<div style='margin-top:2000px'></div>", unsafe_allow_html=True)
-
 if __name__ == "__main__":
     main()
-
