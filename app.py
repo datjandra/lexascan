@@ -95,6 +95,9 @@ def main():
                     if 'media' in key:
                         image_url = selected_item[key][0]['url']
                         break
+
+                if image_url:
+                    st.image(image_url, use_column_width=True)
                 
                 # Create formatted string with title, image URL, and description
                 formatted_string = f"Title: {selected_item.title}\n"
