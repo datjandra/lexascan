@@ -78,6 +78,32 @@ def extract_info(text):
     print("Completion:\n")
     return json.loads(output.data.text.raw)
 
+# Function to extract text info only using TruLens
+@lru_cache(maxsize=128)
+def extract_text_info(text):
+    try:
+       template = f"""
+        Here is some text.
+        Extract named entities such as people, places, companies, and organizations from the text into a structured JSON format.
+        Extract any dates and times from the text.
+
+        {text}
+        """
+
+        prompt = PromptTemplate(input_variables=["text"], template=template)
+        llm = ChatOpenAI(model_name="gpt-3.5-turbo")
+        chain = LLMChain(llm=llm, prompt=prompt, memory=memory, verbose=True)
+
+        f_relevance = Feedback(openai.relevance).on_input_output()
+
+        # TruLens Eval chain recorder
+        chain_recorder = TruChain(
+            chain, app_id="contextual-chatbot", feedbacks=[f_relevance]
+        )
+    except:
+        # ignore all errors
+        pass
+    
 # Main function to run the Streamlit app
 def main():
     st.title("LexaScan")
@@ -128,6 +154,8 @@ def main():
                         st.write("Extracted Info:")
                         st.json(extracted_info)
 
+                        extract_text_info(item_details)
+                        
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
 
