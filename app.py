@@ -27,6 +27,10 @@ stub = service_pb2_grpc.V2Stub(channel)
 metadata = (('authorization', 'Key ' + PAT),)
 userDataObject = resources_pb2.UserAppIDSet(user_id=USER_ID, app_id=APP_ID)
 
+hugs = Huggingface()
+openai = OpenAI()
+tru = Tru()
+
 # Function to fetch RSS feed items
 @lru_cache(maxsize=128)
 def fetch_feed(url):
