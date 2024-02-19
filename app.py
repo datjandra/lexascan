@@ -82,7 +82,7 @@ def extract_info(text):
 @lru_cache(maxsize=128)
 def extract_text_info(text):
     try:
-       template = f"""
+        template = f"""
         Here is some text.
         Extract named entities such as people, places, companies, and organizations from the text into a structured JSON format.
         Extract any dates and times from the text.
