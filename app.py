@@ -41,10 +41,7 @@ def fetch_feed(url):
 @lru_cache(maxsize=128)
 def extract_info(text):
     prompt = f"""
-    Here is some text and an optional image link.
-    Extract named entities such as people, places, companies, and organizations from the image and text into a structured JSON format.
-    Extract any dates and times from the text.
-    Extract any objects from the image.
+    Here is some text and an optional image link. Extract named entities such as people, places, companies, and organizations from the image and text into a structured JSON format. Extract any dates and times from the text. Extract any objects from the image.
 
     {text}
     """
@@ -141,10 +138,10 @@ def main():
                 
                 # Create formatted string with title, image URL, and description
                 formatted_string = f"Title: {selected_item.title}\n"
+                formatted_string += f"Description: {selected_item.summary}\n"
                 if image_url:
-                    formatted_string += f"Image URL: {image_url}\n"
-                formatted_string += f"Description: {selected_item.summary}"
-
+                    formatted_string += f"Image:\n{image_url}"
+                    
                 # Write formatted string to text area
                 item_details = st.text_area("Details", value=formatted_string, height=200)
 
