@@ -9,6 +9,12 @@ from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
 from clarifai_grpc.grpc.api import resources_pb2, service_pb2, service_pb2_grpc
 from clarifai_grpc.grpc.api.status import status_code_pb2
 
+from langchain.chains import LLMChain
+from langchain.chat_models import ChatOpenAI
+from langchain.prompts import PromptTemplate
+from langchain.memory import ConversationBufferMemory
+from trulens_eval import TruChain, Feedback, OpenAI, Huggingface, Tru
+
 USER_ID = 'openai'
 APP_ID = 'chat-completion'
 # Change these to whatever model and text URL you want to use
