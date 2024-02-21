@@ -114,6 +114,7 @@ def extract_info_openai(text, image_url):
             tru_llm_standalone_recorder.app(prompt_input)
 
         stdout = io.StringIO()
+        contextlib.redirect_stdout(stdout)
         st.write(prompt_output, stdout.getvalue())
         return json.loads(prompt_output)
     except:
@@ -170,10 +171,10 @@ def main():
                         st.write("Extracted Info:")
                         st.json(extracted_info)
 
-                        if image_url:
-                            text_details = f"Title: {selected_item.title}\n"
-                            text_details += f"Description: {selected_item.summary}\n"
-                            extract_info_openai(text_details, image_url)
+                    if image_url:
+                        text_details = f"Title: {selected_item.title}\n"
+                        text_details += f"Description: {selected_item.summary}\n"
+                        extract_info_openai(text_details, image_url)
                         
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
