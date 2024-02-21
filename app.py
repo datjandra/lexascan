@@ -86,6 +86,8 @@ def extract_info_clarifai(text):
     return output.data.text.raw
 
 # Function to extract info using OpenAI and TruLens
+tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=feedbacks)
+
 @lru_cache(maxsize=128)
 def extract_info(prompt_input):
     prompt_output = extract_info_clarifai(prompt_input)
@@ -95,8 +97,6 @@ def extract_info(prompt_input):
     except:
         pass
     return json.loads(prompt_output)
-
-tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=feedbacks)
 
 # Main function to run the Streamlit app
 def main():
