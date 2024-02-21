@@ -11,8 +11,8 @@ from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
 from clarifai_grpc.grpc.api import resources_pb2, service_pb2, service_pb2_grpc
 from clarifai_grpc.grpc.api.status import status_code_pb2
 
-from openai import OpenAI
-from trulens_eval import Feedback, OpenAI as fOpenAI, Tru, TruBasicApp
+from trulens_eval import Feedback, Tru, TruBasicApp
+from trulens_eval.feedback.provider import OpenAI
 
 USER_ID = 'openai'
 APP_ID = 'chat-completion'
@@ -26,12 +26,12 @@ stub = service_pb2_grpc.V2Stub(channel)
 metadata = (('authorization', 'Key ' + PAT),)
 userDataObject = resources_pb2.UserAppIDSet(user_id=USER_ID, app_id=APP_ID)
 
-# Create openai client
-client = OpenAI()
-
 # Initialize TruLens
 tru = Tru()
 tru.reset_database()
+
+# Initialize OpenAI provider
+provider = OpenAI()
 
 # Function to fetch RSS feed items
 @lru_cache(maxsize=128)
@@ -77,37 +77,22 @@ def extract_info_clarifai(text):
     print("Completion:\n")
     return output.data.text.raw
 
-def llm_standalone(prompt_input, image_link):
-    return client.chat.completions.create(
-    model="gpt-4-vision-preview",
-    messages=[
-            {
-              "role": "user",
-              "content": [
-                {"type": "text", "text": "return objects in image as JSON structure"},
-                {
-                  "type": "image_url",
-                  "image_url": {
-                    "url": "{image_url}",
-                  },
-                },
-              ],
-            }
-          ],
-        max_tokens=300
-    ).choices[0].message.content
-
 # Function to extract info using OpenAI and TruLens
 @lru_cache(maxsize=128)
 def extract_info(prompt_input):
     prompt_output = extract_info_clarifai(prompt_input)
     try:    
-        # Initialize OpenAI-based feedback function collection class:
-        fopenai = fOpenAI()
+        f_controversiality = Feedback(
+            provider.controversiality_with_cot_reasons,
+            name="Controversiality",
+            higher_is_better=False,
+        ).on_output()
 
-        f_relevance = Feedback(openai.relevance).on_input_output()
-
-        tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=[f_relevance])
+        feedbacks = [
+            f_controversiality
+        ]
+        
+        tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=feedbacks)
         with tru_llm_standalone_recorder as recording:
             tru_llm_standalone_recorder.app(prompt_input)
     except:
