@@ -9,8 +9,8 @@ from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
 from clarifai_grpc.grpc.api import resources_pb2, service_pb2, service_pb2_grpc
 from clarifai_grpc.grpc.api.status import status_code_pb2
 
+from streamlit.redirect as sr
 from openai import OpenAI
-
 from trulens_eval import Feedback, OpenAI as fOpenAI, Tru, TruBasicApp
 
 USER_ID = 'openai'
@@ -112,6 +112,8 @@ def extract_info_openai(text, image_url):
         with tru_llm_standalone_recorder as recording:
             tru_llm_standalone_recorder.app(prompt_input)
 
+        with sr.stdout:
+          print(prompt_output)
         return json.loads(prompt_output)
     except:
         # ignore all errors
