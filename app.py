@@ -9,11 +9,9 @@ from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
 from clarifai_grpc.grpc.api import resources_pb2, service_pb2, service_pb2_grpc
 from clarifai_grpc.grpc.api.status import status_code_pb2
 
-from langchain.chains import LLMChain
-from langchain.chat_models import ChatOpenAI
-from langchain.prompts import PromptTemplate
-from langchain.memory import ConversationBufferMemory
-from trulens_eval import TruChain, Feedback, OpenAI, Huggingface, Tru
+from openai import OpenAI
+
+from trulens_eval import Feedback, OpenAI as fOpenAI, Tru, TruBasicApp
 
 USER_ID = 'openai'
 APP_ID = 'chat-completion'
@@ -27,9 +25,12 @@ stub = service_pb2_grpc.V2Stub(channel)
 metadata = (('authorization', 'Key ' + PAT),)
 userDataObject = resources_pb2.UserAppIDSet(user_id=USER_ID, app_id=APP_ID)
 
-hugs = Huggingface()
-openai = OpenAI()
+# Create openai client
+client = OpenAI()
+
+# Initialize TruLens
 tru = Tru()
+tru.reset_database()
 
 # Function to fetch RSS feed items
 @lru_cache(maxsize=128)
@@ -75,28 +76,43 @@ def extract_info(text):
     print("Completion:\n")
     return json.loads(output.data.text.raw)
 
-# Function to extract text info only using TruLens
+def llm_standalone(prompt_input, image_link):
+    return client.chat.completions.create(
+    model="gpt-4-vision-preview",
+    messages=[
+            {
+              "role": "user",
+              "content": [
+                {"type": "text", "text": "return objects in image as JSON structure"},
+                {
+                  "type": "image_url",
+                  "image_url": {
+                    "url": "{image_url}",
+                  },
+                },
+              ],
+            }
+          ],
+        max_tokens=300
+    ).choices[0].message.content
+
+# Function to extract info using OpenAI and TruLens
 @lru_cache(maxsize=128)
-def extract_text_info(text):
+def extract_info_openai(text, image_url):
     try:
-        template = f"""
-        Here is some text.
-        Extract named entities such as people, places, companies, and organizations from the text into a structured JSON format.
-        Extract any dates and times from the text.
-
-        {text}
-        """
-
-        prompt = PromptTemplate(input_variables=["text"], template=template)
-        llm = ChatOpenAI(model_name="gpt-3.5-turbo")
-        chain = LLMChain(llm=llm, prompt=prompt, memory=memory, verbose=True)
+        prompt_input = "Return entities and objects in image as JSON structure"
+        prompt_output = llm_standalone(prompt_input, image_url)
+        
+        # Initialize OpenAI-based feedback function collection class:
+        fopenai = fOpenAI()
 
         f_relevance = Feedback(openai.relevance).on_input_output()
 
-        # TruLens Eval chain recorder
-        chain_recorder = TruChain(
-            chain, app_id="contextual-chatbot", feedbacks=[f_relevance]
-        )
+        tru_llm_standalone_recorder = TruBasicApp(llm_standalone, app_id="LexaScan", feedbacks=[f_relevance])
+        with tru_llm_standalone_recorder as recording:
+            tru_llm_standalone_recorder.app(prompt_input)
+
+        return json.loads(prompt_output)
     except:
         # ignore all errors
         pass
@@ -151,7 +167,10 @@ def main():
                         st.write("Extracted Info:")
                         st.json(extracted_info)
 
-                        extract_text_info(item_details)
+                        if image_url:
+                            text_details = f"Title: {selected_item.title}\n"
+                            text_details += f"Description: {selected_item.summary}\n"
+                            extract_info_openai(text_details, image_url)
                         
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
