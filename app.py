@@ -116,7 +116,7 @@ def extract_info_openai(text, image_url):
         stdout = io.StringIO()
         contextlib.redirect_stdout(stdout)
         st.write(prompt_output, stdout.getvalue())
-        return json.loads(prompt_output)
+        return prompt_output
     except:
         # ignore all errors
         pass
@@ -176,7 +176,7 @@ def main():
                         text_details += f"Description: {selected_item.summary}\n"
                         extracted_info = extract_info_openai(text_details, image_url)
                         st.write("Extracted Info:")
-                        st.json(extracted_info)
+                        st.write(extracted_info)
                         
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
