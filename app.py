@@ -3,8 +3,6 @@ import feedparser
 import requests
 import os
 import json
-import io
-import contextlib
 from functools import lru_cache
 
 from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
