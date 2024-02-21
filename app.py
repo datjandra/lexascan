@@ -41,7 +41,7 @@ def fetch_feed(url):
 
 # Function to extract info
 @lru_cache(maxsize=128)
-def extract_info(text):
+def extract_info_clarifai(text):
     prompt = f"""
     Here is some text and an optional image link. Extract named entities such as people, places, companies, and organizations from the image and text into a structured JSON format. Extract any dates and times from the text. Extract any objects from the image.
 
@@ -75,7 +75,7 @@ def extract_info(text):
     output = post_model_outputs_response.outputs[0]
 
     print("Completion:\n")
-    return json.loads(output.data.text.raw)
+    return output.data.text.raw
 
 def llm_standalone(prompt_input, image_link):
     return client.chat.completions.create(
@@ -99,24 +99,20 @@ def llm_standalone(prompt_input, image_link):
 
 # Function to extract info using OpenAI and TruLens
 @lru_cache(maxsize=128)
-def extract_info_openai(text, image_url):
+def extract_info(prompt_input):
     try:
-        prompt_input = "Return entities and objects in image as JSON structure"
-        prompt_output = llm_standalone(prompt_input, image_url)
+        prompt_output = extract_info_clarifai(prompt_input)
         
         # Initialize OpenAI-based feedback function collection class:
         fopenai = fOpenAI()
 
         f_relevance = Feedback(openai.relevance).on_input_output()
 
-        tru_llm_standalone_recorder = TruBasicApp(llm_standalone, app_id="LexaScan", feedbacks=[f_relevance])
+        tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=[f_relevance])
         with tru_llm_standalone_recorder as recording:
             tru_llm_standalone_recorder.app(prompt_input)
-
-        stdout = io.StringIO()
-        contextlib.redirect_stdout(stdout)
-        st.write(prompt_output, stdout.getvalue())
-        return prompt_output
+            
+        return json.loads(prompt_output)
     except:
         # ignore all errors
         pass
@@ -170,13 +166,6 @@ def main():
                         extracted_info = extract_info(item_details)
                         st.write("Extracted Info:")
                         st.json(extracted_info)
-
-                    # if image_url:
-                    #    text_details = f"Title: {selected_item.title}\n"
-                    #    text_details += f"Description: {selected_item.summary}\n"
-                    #    extracted_info = extract_info_openai(text_details, image_url)
-                    #    st.write("Extracted Info:")
-                    #    st.write(extracted_info)
                         
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
