@@ -31,6 +31,17 @@ tru.reset_database()
 # Initialize OpenAI provider
 provider = OpenAI()
 
+f_controversiality = Feedback(
+    provider.controversiality_with_cot_reasons,
+    name="Controversiality",
+    higher_is_better=False,
+).on_output()
+
+feedbacks = [
+    f_controversiality
+]    
+tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=feedbacks)
+
 # Function to fetch RSS feed items
 @lru_cache(maxsize=128)
 def fetch_feed(url):
@@ -80,17 +91,6 @@ def extract_info_clarifai(text):
 def extract_info(prompt_input):
     prompt_output = extract_info_clarifai(prompt_input)
     try:    
-        f_controversiality = Feedback(
-            provider.controversiality_with_cot_reasons,
-            name="Controversiality",
-            higher_is_better=False,
-        ).on_output()
-
-        feedbacks = [
-            f_controversiality
-        ]
-        
-        tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=feedbacks)
         with tru_llm_standalone_recorder as recording:
             tru_llm_standalone_recorder.app(prompt_input)
     except:
