@@ -40,7 +40,6 @@ f_controversiality = Feedback(
 feedbacks = [
     f_controversiality
 ]    
-tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=feedbacks)
 
 # Function to fetch RSS feed items
 @lru_cache(maxsize=128)
@@ -96,6 +95,8 @@ def extract_info(prompt_input):
     except:
         pass
     return json.loads(prompt_output)
+
+tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=feedbacks)
 
 # Main function to run the Streamlit app
 def main():
