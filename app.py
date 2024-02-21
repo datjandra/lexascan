@@ -85,15 +85,14 @@ def extract_info_clarifai(text):
     print("Completion:\n")
     return output.data.text.raw
 
-# Function to extract info using OpenAI and TruLens
+# Initialize TruLens recorder
 tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=feedbacks)
 
 @lru_cache(maxsize=128)
 def extract_info(prompt_input):
     prompt_output = extract_info_clarifai(prompt_input)
     try:    
-        with tru_llm_standalone_recorder as recording:
-            tru_llm_standalone_recorder.app(prompt_input)
+        tru_llm_standalone_recorder.app(prompt_input)
     except:
         pass
     return json.loads(prompt_output)
