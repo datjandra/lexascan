@@ -166,15 +166,17 @@ def main():
                 item_details = st.text_area("Details", value=formatted_string, height=200)
 
                 if st.button("Extract"):
-                    if item_details:
-                        extracted_info = extract_info(item_details)
-                        st.write("Extracted Info:")
-                        st.json(extracted_info)
+                    # if item_details:
+                    #    extracted_info = extract_info(item_details)
+                    #    st.write("Extracted Info:")
+                    #    st.json(extracted_info)
 
                     if image_url:
                         text_details = f"Title: {selected_item.title}\n"
                         text_details += f"Description: {selected_item.summary}\n"
-                        extract_info_openai(text_details, image_url)
+                        extracted_info = extract_info_openai(text_details, image_url)
+                        st.write("Extracted Info:")
+                        st.json(extracted_info)
                         
             except Exception as e:
                 st.error(f"Error fetching RSS feed: {e}")
