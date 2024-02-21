@@ -1,10 +1,9 @@
 import streamlit as st
-import streamlit.redirect as sr
-
 import feedparser
 import requests
 import os
 import json
+import io
 from functools import lru_cache
 
 from clarifai_grpc.channel.clarifai_channel import ClarifaiChannel
@@ -113,8 +112,8 @@ def extract_info_openai(text, image_url):
         with tru_llm_standalone_recorder as recording:
             tru_llm_standalone_recorder.app(prompt_input)
 
-        with sr.stdout:
-          print(prompt_output)
+        stdout = io.StringIO()
+        st.write(prompt_output, stdout.getvalue())
         return json.loads(prompt_output)
     except:
         # ignore all errors
