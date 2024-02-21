@@ -100,9 +100,8 @@ def llm_standalone(prompt_input, image_link):
 # Function to extract info using OpenAI and TruLens
 @lru_cache(maxsize=128)
 def extract_info(prompt_input):
-    try:
-        prompt_output = extract_info_clarifai(prompt_input)
-        
+    prompt_output = extract_info_clarifai(prompt_input)
+    try:    
         # Initialize OpenAI-based feedback function collection class:
         fopenai = fOpenAI()
 
@@ -111,12 +110,10 @@ def extract_info(prompt_input):
         tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=[f_relevance])
         with tru_llm_standalone_recorder as recording:
             tru_llm_standalone_recorder.app(prompt_input)
-            
-        return json.loads(prompt_output)
     except:
-        # ignore all errors
         pass
-    
+    return json.loads(prompt_output)
+
 # Main function to run the Streamlit app
 def main():
     st.title("LexaScan")
