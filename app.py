@@ -85,12 +85,37 @@ def extract_info_clarifai(text):
     print("Completion:\n")
     return output.data.text.raw
 
+from openai import OpenAI
+client = OpenAI()
+
+def extract_info_openai(text, image_url):
+    response = client.chat.completions.create(
+      model="gpt-4-vision-preview",
+      messages=[
+        {
+          "role": "user",
+          "content": [
+            {"type": "text", "text": text},
+            {
+              "type": "image_url",
+              "image_url": {
+                "url": image_url,
+              },
+            },
+          ],
+        }
+      ],
+      max_tokens=300,
+    )
+    return response.choices[0]
+
 # Initialize TruLens recorder
 tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=feedbacks)
 
 @lru_cache(maxsize=128)
-def extract_info(prompt_input):
-    prompt_output = extract_info_clarifai(prompt_input)
+def extract_info(prompt_input, image_url):
+    # prompt_output = extract_info_clarifai(prompt_input)
+    prompt_output = extract_info_openai(prompt_input, image_url)
     try:    
         tru_llm_standalone_recorder.app(prompt_input)
     except:
@@ -143,7 +168,7 @@ def main():
 
                 if st.button("Extract"):
                     if item_details:
-                        extracted_info = extract_info(item_details)
+                        extracted_info = extract_info(item_details, image_url)
                         st.write("Extracted Info:")
                         st.json(extracted_info)
                         
