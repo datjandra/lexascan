@@ -88,7 +88,6 @@ def extract_info_clarifai(text):
 # Initialize TruLens recorder
 tru_llm_standalone_recorder = TruBasicApp(extract_info_clarifai, app_id="LexaScan", feedbacks=feedbacks)
 
-@lru_cache(maxsize=128)
 def extract_info(prompt_input):
     prompt_output = extract_info_clarifai(prompt_input)
     try:    
