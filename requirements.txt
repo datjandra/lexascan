@@ -3,3 +3,4 @@ feedparser==6.0.8
 requests
 clarifai-grpc
 trulens-eval
+openai
